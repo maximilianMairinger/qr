@@ -1,0 +1,51 @@
+component-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+:host {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+c-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  z-index: 101;
+}
+
+
+c-page-manager {
+  opacity: 1;
+}
+
+c-lower-nav {
+  height: 75px;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  z-index: 101;
+  left: 10px;
+  bottom: 10px;
+  right: 10px;
+  position: absolute;
+}
+
+cookie-notice-container {
+  bottom: 16px;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
+  z-index: 420;
+  display: block;
+  position: absolute;
+}

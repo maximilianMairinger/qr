@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  --_focus: var(--focus);
+}
+
+c-button {
+  width: inherit;
+  height: inherit;
+  max-height: inherit;
+  max-width: inherit;
+  font-weight: inherit;
+
+  
+  --focus: var(--_focus);
+
+}
+
+move-me {
+  background-color: transparent;
+}
+
+::slotted(*) {
+  z-index: 1;
+}
