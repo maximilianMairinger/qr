@@ -1,0 +1,8 @@
+component-body {
+  background-color: var(--dark-background);
+}
+
+c-image {
+  --object-position: 70% 0%;
+  z-index: 1;
+}

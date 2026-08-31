@@ -1,7 +1,7 @@
 export default {
   appName: {
-    short: "qr",
-    long: "Qr"
+    short: "ko50",
+    long: "Ko50"
   },
   links: {
     contact: "Contact",

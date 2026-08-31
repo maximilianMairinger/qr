@@ -1,0 +1,165 @@
+:host {
+  padding-bottom: 50px;
+  padding-top: 50px;
+  background-color: rgb(var(--secondary-themed-background));
+}
+
+component-body {
+  box-sizing: border-box;
+  padding: 0 calc(10% - 12px);
+  
+}
+
+
+under-section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+under-section.a {
+  padding-bottom: 20px;
+}
+
+c-text-blob {
+  margin: 0 calc(5% - 12px);
+  margin-top: 50px;
+  margin-bottom: 10px;
+  --header-fontsize-factor: 3.5;
+  --theme: var(--secondary-theme);
+
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+c-ripple-button {
+  width: 250px;
+  aspect-ratio: 1/1;
+  margin: 15px;
+}
+
+c-ripple-button {
+  --background-color: white;
+  --active-cover-zIndex: 2;
+}
+
+c-ripple-button > * {
+  border-radius: 20px;
+  overflow: none;
+  background-color: transparent;
+  width: 230px;
+  height: 230px;
+  aspect-ratio: 1/1;
+  padding: 10px;
+  // box-sizing: border-box;
+}
+
+c-ripple-button > c-image {
+  --object-fit: contain;
+}
+
+
+
+
+
+component-body:not(.sideLayout) {
+  under-section.b {
+    box-sizing: border-box;
+    padding-left: calc(5% - 12px); 
+    padding-right: calc(5% - 12px); 
+  }
+  c-text-blob {
+    text-align: center;
+  }
+}
+
+component-body.sideLayout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+component-body.sideLayout {
+
+  under-section {
+    width: 50%;
+    flex-grow: 1;
+    // min-width: 300px;
+    min-width: min-content;
+  }
+  under-section.a {
+    width: 40%;
+    justify-content: flex-start;
+  }
+  under-section.b {
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 300px;
+    flex-wrap: nowrap;
+  }
+  @media (max-width: 1000px) {
+    under-section.b {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    under-section.a, under-section.b {
+      width: 100%;
+    }
+    
+  }
+  // text-blob {
+  //   width: 100%;
+  // }
+}
+
+
+
+
+
+
+
+c-fidget {
+  display: block;
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+c-fidget.a {
+  top: 25px;
+  margin-left: 350px;
+  --color: rgb(var(--secondary-theme));
+}
+
+@media (max-width: 600px) {
+  c-fidget.a {
+    top: 50px;
+    margin-left: 300px;
+  }
+} 
+
+@media (max-width: 400px) {
+  c-ripple-button {
+    width: 100%;
+  }
+}
+
+component-body.headerTooSmall {
+  c-text-blob {
+    // --widthOfHeading: min-content;
+    --word-break: normal;
+  }
+
+  c-fidget.a {
+    margin-left: 200px;
+  }
+} 
+
+

@@ -1,6 +1,5 @@
 import delay from "tiny-delay";
 import declareComponent from "../../../../../../../lib/declareComponent"
-import { loadRecord } from "../../../../frame";
 import Section from "../frameTextSection"
 import { BodyTypes } from "./pugBody.gen"; import "./pugBody.gen"
 

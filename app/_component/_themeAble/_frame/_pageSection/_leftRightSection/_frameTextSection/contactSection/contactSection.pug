@@ -6,7 +6,7 @@ left-side.frameSide
         content-wrapper
           confirmation-text 
             h2(style="margin-bottom: 5px") Google Maps laden
-            span Ich bin damit einverstanden, dass Inhalte von Google Maps angezeigt werden. Dabei werden personenbezogene Daten (z.B. IP-Adresse) an Google übermittelt und ggf. in die USA transferiert. Weitere Informationen finden Sie in unserer <c-link link='datenschutz'>Datenschutzerklärung</c-link>.
+            span Ich bin damit einverstanden, dass Inhalte von Google Maps angezeigt werden. Dabei werden personenbezogene Daten (z.B. IP-Adresse) an Google übermittelt und ggf. in die USA transferiert. Weitere Informationen finden Sie in unserer <c-link link='legal/datenschutzerklarung-ko50'>Datenschutzerklärung</c-link>.
           c-load-button(name="consentMaps").consentMaps.themed
             span Einverstanden
     iframe(
@@ -19,9 +19,10 @@ left-side.frameSide
     )
 
 right-side 
-  c-text-blob(note="WIE MAN UNS ERREICHT" heading="Kontakt" text="Kontaktieren sie unsere Direktion mit den unten angeführten Daten. Oder kontaktieren sie den entsprechenden Lehrer direkt über ihre <c-link link='contact/teachers'>E-Mail Adresse</c-link>. ") 
-    b Adresse: 
-    c-copy-link Konstanziagasse 50, 1220 Wien 
+  c-text-blob(note="WIE MAN UNS ERREICHT" heading="Kontakt") 
+    div 
+      span Kontaktieren sie unsere Direktion oder unsere Lehrer unter den unten angeführten Daten.
+      c-copy-link Konstanziagasse 50, 1220 Wien 
 
     h3 Sekretariat
     contact-table
