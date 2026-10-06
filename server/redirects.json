@@ -1,4 +1,10 @@
 {
-  "localhost/test": "https://github.com/maximilianMairinger/qr",
-  "go.example.com/hello": "https://example.com"
+  "qr.energytip.at/qrFormDennis": "https://start.energytip.at/f/f4MUaYBv6ULo",
+  "qr.energytip.at/qrWaDennis": "https://api.whatsapp.com/send?phone=436765561450&text=Guten%20Tag!%20%F0%9F%91%8B%0A%0AIch%20interessiere%20mich%20f%C3%BCr%20eine%20*unverbindliche%20und%20kostenfreie*%20Tarifoptimierung%20%E2%9A%A1%0A%0AVielen%20Dank%20und%20liebe%20Gr%C3%BC%C3%9Fe",
+  
+  "qr.energytip.at/qrFormMarco": "https://start.energytip.at/f/Xa6peQsKsnVG",
+  "qr.energytip.at/qrWaMarco": "https://api.whatsapp.com/send?phone=4367762847491&text=Guten%20Tag!%20%F0%9F%91%8B%0A%0AIch%20interessiere%20mich%20f%C3%BCr%20eine%20%2Aunverbindliche%20und%20kostenfreie%2A%20Tarifoptimierung%20%E2%9A%A1%0A%0AVielen%20Dank%20und%20liebe%20Gr%C3%BC%C3%9Fe",
+
+  "qr.energytip.at/qrFormCommon": "https://start.energytip.at/f/6WvcjfitDl85",
+  "qr.energytip.at/qrWaCommon": "https://api.whatsapp.com/send?phone=436703541203&text=Guten%20Tag!%20%F0%9F%91%8B%0A%0AIch%20interessiere%20mich%20f%C3%BCr%20eine%20%2Aunverbindliche%20und%20kostenfreie%2A%20Tarifoptimierung%20%E2%9A%A1%0A%0AVielen%20Dank%20und%20liebe%20Gr%C3%BC%C3%9Fe"
 }
