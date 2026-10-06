@@ -5,6 +5,7 @@ import * as MongoDB from "mongodb";
 const MongoClient = MongoDB.MongoClient
 import pth from "path"
 import fs from "fs"
+import { STATUS_CODES } from "http"
 import detectPort from "detect-port"
 import ws, { WebSocketServer, WebSocket } from "ws"
 import keyIndex from "key-index"
@@ -21,14 +22,20 @@ export type App = express.Express & {
 
 export type SendFileProxyFunc = (file: string, ext: string, fileName: string) => string | void | null
 
-export function configureExpressApp(indexUrl: string, publicPath: string, sendFileProxy?: Promise<SendFileProxyFunc> | SendFileProxyFunc, callAtStart?: (app: express.Express) => express.Express | void) {
-  if (indexUrl !== "*") if (!indexUrl.startsWith("/")) indexUrl = "/" + indexUrl
+/**
+ * @param indexUrl route the app's index.html is served on, null to not serve it
+ * @param publicPath folder served statically, null to not serve any files
+ */
+export function configureExpressApp(indexUrl: string | null, publicPath: string | null, sendFileProxy?: Promise<SendFileProxyFunc> | SendFileProxyFunc, callAtStart?: (app: express.Express) => express.Express | void) {
+  if (indexUrl !== null && indexUrl !== "*") if (!indexUrl.startsWith("/")) indexUrl = "/" + indexUrl
 
   let app = express() as express.Express & { 
     port: number, 
     getWebSocketServer: (url: `/${string}`) => WebSocketServer,
     ws: (url: `/${string}`, cb: (ws: WebSocket & {on: WebSocket["addEventListener"], off: WebSocket["removeEventListener"]}, req: any) => void) => void,
   }
+
+  app.disable("x-powered-by")
 
   const returnAppPromise = new ResablePromise()
   
@@ -60,7 +67,7 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
     })()
   }
 
-  app.use(express.static(pth.join(pth.resolve(""), publicPath), {index: false}))
+  if (publicPath !== null) app.use(express.static(pth.join(pth.resolve(""), publicPath), {index: false}))
 
 
 
@@ -68,6 +75,10 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
   app.old_get = app.get
   //@ts-ignore
   app.get = (url: string, cb: (req: any, res: any, next) => void) => {
+    // app.get(name) is also express' settings getter, which express itself calls on every request
+    // (e.g. "trust proxy fn", "etag fn"). Registering a route for those leaked memory on every request.
+    //@ts-ignore
+    if (cb === undefined) return app.old_get(url)
     //@ts-ignore
     app.old_get(url, (req, res, next) => {
       res.old_sendFile = res.sendFile
@@ -105,7 +116,13 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
     }
   
     expressServer.on("upgrade", (request, socket, head) => {
-      const url = request.url as `/${string}`
+      const url = request.url.split("?")[0] as `/${string}`
+      // Only upgrade on registered paths. Creating a server for whatever path is requested let anyone
+      // pile up WebSocketServers (memory) and accepted-but-unhandled sockets.
+      if (!webSocketServerMap.has(url)) {
+        socket.destroy()
+        return
+      }
       // @ts-ignore
       webSocketServerMap(url).handleUpgrade(request, socket, head, (websocket) => {
         webSocketServerMap(url).emit("connection", websocket, request);
@@ -116,35 +133,55 @@ export function configureExpressApp(indexUrl: string, publicPath: string, sendFi
     await returnAppPromise.res(app)
     // everything after user land code
 
-    app.get(indexUrl, (req, res) => {
+    if (indexUrl !== null) app.get(indexUrl, (req, res) => {
       res.sendFile("public/index.html")
     });
+
+    // generic responses only, never leak details (e.g. stack traces) to the client
+    app.use((req, res) => {
+      sendStatus(res, 404)
+    })
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const status = err?.status >= 400 && err?.status < 500 ? err.status : 500
+      if (status >= 500) console.error(err)
+      if (res.headersSent) return next(err)
+      sendStatus(res, status)
+    })
   })
 
 
   return returnAppPromise as any as Promise<typeof app>
 }
 
-type DBConfig = {
+export function sendStatus(res: express.Response, status: number) {
+  res.status(status).type("text/plain").send(STATUS_CODES[status] ?? "Error")
+}
+
+export type DBConfig = {
   url: string,
   dbName: string
+}
+
+/** Single connection attempt, rejects if the db isn't reachable */
+export async function connectToDB(dbName_DBConfig: string | DBConfig, clientOptions: MongoDB.MongoClientOptions = {}): Promise<MongoDB.Db> {
+  const dbConfig = typeof dbName_DBConfig === "string" ? { dbName: dbName_DBConfig, url: "mongodb://127.0.0.1:27017" } : dbName_DBConfig
+  const client = await MongoClient.connect(dbConfig.url, { useUnifiedTopology: true, ...clientOptions })
+  return client.db(dbConfig.dbName)
 }
 
 
 const publicPath = "./public"
 
-export default function (dbName_DBConfig: string | DBConfig, indexUrl?: string): Promise<{ db: MongoDB.Db, app: App }>
-export default function (dbName_DBConfig?: undefined | null, indexUrl?: string): Promise<App>;
-export default function (dbName_DBConfig?: string | null | undefined | DBConfig, indexUrl: string = "*"): any {
-  return configureExpressApp(indexUrl, publicPath).then((app) => {
+/**
+ * @param indexUrl route the app (SPA) is served on, null to not serve the app (nor anything from public/) at all
+ */
+export default function (dbName_DBConfig?: undefined | null, indexUrl?: string | null): Promise<App>;
+export default function (dbName_DBConfig: string | DBConfig, indexUrl?: string | null): Promise<{ db: MongoDB.Db, app: App }>
+export default function (dbName_DBConfig?: string | null | undefined | DBConfig, indexUrl: string | null = "*"): any {
+  return configureExpressApp(indexUrl, indexUrl === null ? null : publicPath).then((app) => {
     if (dbName_DBConfig) {
-      let dbConfig: DBConfig
-      if (typeof dbName_DBConfig === "string") dbConfig = { dbName: dbName_DBConfig, url: "mongodb://127.0.0.1:27017"}
-      else dbConfig = dbName_DBConfig
-
       const prom = new Promise((res) => {
-        MongoClient.connect(dbConfig.url, { useUnifiedTopology: true }).then(async (client) => {
-          let db = client.db(dbConfig.dbName)
+        connectToDB(dbName_DBConfig).then(async (db) => {
           res({db, app: await app})
         }).catch(async (e) => {
           console.error("Unable to connect to MongoDB")
